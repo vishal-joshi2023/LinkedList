@@ -25,3 +25,57 @@ Node* kReverse(Node* head, int k) {
 
     return head;
 }
+
+***********
+// optimize
+
+ void reverse(ListNode* s , ListNode* e){
+      ListNode *pre = NULL;
+      ListNode *curr = s;
+
+      while(pre!=e){
+        ListNode *next = curr->next;
+        curr->next = pre;
+        pre = curr;
+        curr = next;
+      }
+    }
+    ListNode* reverseKGroup(ListNode* head, int k) {
+        
+        if(k==0||k==1||!head) return head;
+
+        //if we reverse list then the pre & nxt part lost so 
+        //keep track of both ptrs
+
+        ListNode* dummy = new ListNode(-1);
+
+        dummy->next = head;
+        ListNode* e = head;
+        ListNode* beforeStart = dummy;
+        int i=0;
+        
+        while(e){
+
+          i++;
+          if(i%k==0){
+            
+            //reserve ptrs
+            ListNode *s = beforeStart->next;
+            ListNode *last = e->next;
+            // reverse
+            reverse(s,e);
+
+            //connection
+             beforeStart->next = e;
+             s->next = last;
+
+             e = last;        // end
+             beforeStart = s; // new startPreV/ next start 
+          }
+          else{
+            e = e->next;
+          }
+        } 
+
+        return dummy->next; 
+    }
