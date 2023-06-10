@@ -1,0 +1,24 @@
+// make curr  = curr.next delete curr.next
+void deleteNode(LinkedListNode<int> * node) {
+    
+    node->data = node->next->data;
+    node->next = node->next->next;
+    
+}
+
+// shift to left delete last
+void deleteNode(LinkedListNode<int> * node) {
+    while(node->next!=NULL)
+        {
+               
+            node->data = node->next->data;
+            // last Node ko remove kro
+            if(node->next->next==NULL)
+               {
+                   node->next=NULL;
+                   return;
+               }
+            node = node->next;
+            
+        }
+}
