@@ -1,87 +1,4 @@
-#include <bits/stdc++.h>
-class LRUCache {
-public:
-
-    //create doubly linkedlist 
-    class node{
-      public:
-      
-        int key,val;
-        node *next , *pre;
-        
-        node(int k,int v){
-          key = k ; 
-          val = v; 
-        }
-    };
-
-    //fill haed tail = dummy val 
-    node *head = new node(-1,-1);
-    node *tail = new node(-1,-1);
-
-    int cap;
-    unordered_map<int , node*> mp; 
-
-
-    LRUCache(int capacity) {
-        cap = capacity;
-        head->next = tail;
-        tail->pre = head;
-    }
-    
-    int get(int k) {
-        
-        if(mp.find(k)!=mp.end()){
-          
-          node *temp = mp[k];
-          int ans = temp->val;
-
-          //removal
-          mp.erase(k);
-          deleteNode(temp);
-          
-          //reinsertion
-          addNode(temp);//into list
-          mp[k] = head->next; //into map
- 
-          return ans;
-        }
-        return -1;
-    }
-    
-    void put(int k, int v) {
-         if(mp.find(k)!=mp.end()){
-          node *temp = mp[k];
-          
-          //removal
-          mp.erase(k);
-          deleteNode(temp);
-         }
-
-        if(mp.size()==cap){
-          mp.erase(tail->pre->key);
-          deleteNode(tail->pre);
-        }
-
-        //insertion
-        node *newNode =  new node(k,v) ;
-        addNode(newNode);
-        mp[k] = head->next;
-    }
-
-    void addNode(node* newNode){
-        
-        newNode->next = head->next;
-        newNode->pre  = head;
-        head->next->pre = newNode;
-        head->next = newNode;
-    }
-    void deleteNode(node* delNode){
-        delNode->pre->next = delNode->next;
-        delNode->next->pre = delNode->pre;
-    }
-};
- /*
+/*
  get item -> if HIT :
                      -> delete Node from map & doublylist
                      -> insert Node again into list after headNode 
@@ -98,3 +15,91 @@ public:
              *if already present -> follow get item
  add / delete node fun          
 */
+
+class LRUCache {
+  class Node{
+    public:  
+      int data;
+      int key;
+      Node *next = NULL;
+      Node *pre  = NULL;
+        
+      Node(int _key,int _data){
+        key = _key;
+        data = _data;
+      }
+  };
+
+int cap;
+Node *head = new Node(-1,-1);
+Node *tail = new Node(-1,-1);
+unordered_map<int, Node* > map;
+
+void insertNode(Node *newNode){
+   newNode->next = head->next;
+   newNode->pre  = head;
+   head->next->pre = newNode;
+   head->next = newNode;
+}
+
+void deleteNode(Node *node){
+   
+   node->pre->next = node->next;
+   node->next->pre = node->pre;
+}
+
+public:
+    LRUCache(int capacity) {
+     
+     cap = capacity;
+
+     head->next = tail;
+     tail->pre = head;   
+    }
+    
+    int get(int key) {
+      // if already exists
+      if(map.find(key)!=map.end()){
+
+        Node* node = map[key]; 
+        int val = node->data;
+
+        // remove old connection
+        map.erase(key); // from map
+        deleteNode(node);  //from link
+        
+        // make new connection
+        insertNode(node); //into link again
+        map[key] = head->next;  // into map
+
+        // page hit return data
+        return val;
+      }   
+
+      return -1; // page fault       
+    }
+    
+    void put(int key, int value) {
+        
+        // if already exist
+        if(map.find(key)!=map.end()){
+           
+           Node* node = map[key]; 
+
+           // remove old connection
+           map.erase(key); // from map
+           deleteNode(node);  //from link
+        }
+        
+        // if not check size if full remove LRU 
+        if(map.size()==cap){
+          // remove LRU
+          map.erase(tail->pre->key);  // from map
+          deleteNode(tail->pre);      // from link
+        } 
+        
+        // insert newNode
+        insertNode(new Node(key,value)); 
+        map[key] = head->next;
+    }
+};
